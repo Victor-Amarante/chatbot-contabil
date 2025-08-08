@@ -13,6 +13,10 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 load_dotenv()
 
+current_pdf_path = None
+retrieval_chain = None
+llm = None
+
 
 def initialize_rag_system(pdf_path: str):
     """Inicializa o sistema RAG com um novo PDF"""
