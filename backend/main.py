@@ -7,6 +7,7 @@ import models
 import schemas
 from database import SessionLocal, engine
 from dotenv import load_dotenv
+import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -59,12 +60,12 @@ def initialize_rag_system(pdf_path: str):
     global current_pdf_path, retrieval_chain, llm
     
     if llm is None:
-        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
     
     try:
         loader = PyPDFLoader(pdf_path)
         docs = loader.load()
-        splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100, separator="\n")
+        splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=150, separator="\n")
         chunks = splitter.split_documents(docs)
 
         embeddings = OpenAIEmbeddings()
@@ -149,3 +150,12 @@ async def get_status():
         "current_pdf": current_pdf_path,
         "rag_initialized": retrieval_chain is not None
     }
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        log_level="info"
+    ) 
